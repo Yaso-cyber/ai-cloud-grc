@@ -1,0 +1,107 @@
+{
+  "generated_at": "2026-04-24T06:00:00Z",
+  "findings": [
+    {
+      "id": "s3/my-public-bucket/S3-001",
+      "resource_type": "s3",
+      "resource_id": "my-public-bucket",
+      "control_id": "S3-001",
+      "control_title": "S3 Public Access",
+      "description": "S3 bucket has public read ACL enabled.",
+      "severity": "HIGH",
+      "severity_weight": 8,
+      "remediation_hint": "Set bucket ACL to private and enable Block Public Access settings.",
+      "framework_refs": {
+        "NIST_800_53": ["AC-3", "SC-7"],
+        "ISO_27001": ["A.9.4.1"],
+        "SOC2": ["CC6.1"]
+      },
+      "scanned_at": "2026-04-24T06:00:00Z"
+    },
+    {
+      "id": "s3/my-public-bucket/S3-002",
+      "resource_type": "s3",
+      "resource_id": "my-public-bucket",
+      "control_id": "S3-002",
+      "control_title": "S3 Versioning Disabled",
+      "description": "S3 bucket versioning is disabled.",
+      "severity": "MEDIUM",
+      "severity_weight": 4,
+      "remediation_hint": "Enable versioning via: aws s3api put-bucket-versioning --bucket my-public-bucket --versioning-configuration Status=Enabled",
+      "framework_refs": {
+        "NIST_800_53": ["CP-9"],
+        "ISO_27001": ["A.12.3.1"],
+        "SOC2": ["A1.2"]
+      },
+      "scanned_at": "2026-04-24T06:00:00Z"
+    },
+    {
+      "id": "iam/admin-user/IAM-001",
+      "resource_type": "iam",
+      "resource_id": "admin-user",
+      "control_id": "IAM-001",
+      "control_title": "IAM User Missing MFA",
+      "description": "IAM user has no MFA device configured.",
+      "severity": "CRITICAL",
+      "severity_weight": 10,
+      "remediation_hint": "Enforce MFA for all IAM users with console access via IAM policy or AWS Organizations SCP.",
+      "framework_refs": {
+        "NIST_800_53": ["IA-2"],
+        "ISO_27001": ["A.9.4.2"],
+        "SOC2": ["CC6.1"]
+      },
+      "scanned_at": "2026-04-24T06:00:00Z"
+    },
+    {
+      "id": "iam/legacy-policy/IAM-002",
+      "resource_type": "iam",
+      "resource_id": "legacy-policy",
+      "control_id": "IAM-002",
+      "control_title": "Wildcard IAM Policy",
+      "description": "IAM policy grants wildcard (*) actions on all resources.",
+      "severity": "HIGH",
+      "severity_weight": 8,
+      "remediation_hint": "Apply least-privilege: replace '*' actions with only required actions and specific resource ARNs.",
+      "framework_refs": {
+        "NIST_800_53": ["AC-6"],
+        "ISO_27001": ["A.9.1.2"],
+        "SOC2": ["CC6.3"]
+      },
+      "scanned_at": "2026-04-24T06:00:00Z"
+    },
+    {
+      "id": "ec2/i-0abc123def456/EC2-001",
+      "resource_type": "ec2",
+      "resource_id": "i-0abc123def456",
+      "control_id": "EC2-001",
+      "control_title": "Unrestricted SSH Access",
+      "description": "EC2 security group allows unrestricted SSH access (0.0.0.0/0 on port 22).",
+      "severity": "HIGH",
+      "severity_weight": 8,
+      "remediation_hint": "Restrict SSH to known IP ranges or use AWS Systems Manager Session Manager instead.",
+      "framework_refs": {
+        "NIST_800_53": ["SC-7", "AC-3"],
+        "ISO_27001": ["A.13.1.1"],
+        "SOC2": ["CC6.6"]
+      },
+      "scanned_at": "2026-04-24T06:00:00Z"
+    },
+    {
+      "id": "vpc/vpc-0def456abc/VPC-001",
+      "resource_type": "vpc",
+      "resource_id": "vpc-0def456abc",
+      "control_id": "VPC-001",
+      "control_title": "VPC Flow Logs Disabled",
+      "description": "VPC Flow Logs are not enabled.",
+      "severity": "MEDIUM",
+      "severity_weight": 4,
+      "remediation_hint": "Enable VPC Flow Logs to CloudWatch or S3 for network traffic visibility.",
+      "framework_refs": {
+        "NIST_800_53": ["AU-2", "AU-12"],
+        "ISO_27001": ["A.12.4.1"],
+        "SOC2": ["CC7.2"]
+      },
+      "scanned_at": "2026-04-24T06:00:00Z"
+    }
+  ]
+}

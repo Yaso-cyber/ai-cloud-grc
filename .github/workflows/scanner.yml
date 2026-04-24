@@ -1,0 +1,81 @@
+name: Scheduled GRC Scan
+
+on:
+  schedule:
+    # Run every day at 06:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch:  # allow manual trigger
+
+jobs:
+  scan:
+    name: Run Cloud Scanner
+    runs-on: ubuntu-latest
+
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Run scanner (mock mode)
+        env:
+          MOCK_MODE: "true"
+          STUB_AI: "true"
+          # Uncomment and set secrets for live AWS scanning:
+          # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          # AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          cd backend
+          python -m scanner.aws_scanner --mock --output ../demo-data/latest-findings.json
+
+      - name: Upload findings artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: grc-findings
+          path: demo-data/latest-findings.json
+
+      - name: Create GitHub Issue with findings summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const findings = JSON.parse(fs.readFileSync('demo-data/latest-findings.json', 'utf8'));
+            const count = findings.findings.length;
+            const critical = findings.findings.filter(f => f.severity === 'CRITICAL').length;
+            const high = findings.findings.filter(f => f.severity === 'HIGH').length;
+
+            const body = [
+              `## GRC Scan Report — ${new Date().toISOString().split('T')[0]}`,
+              '',
+              `| Severity | Count |`,
+              `|---|---|`,
+              `| CRITICAL | ${critical} |`,
+              `| HIGH | ${high} |`,
+              `| Total | ${count} |`,
+              '',
+              '### Top Findings',
+              ...findings.findings.slice(0, 5).map(f =>
+                `- **${f.severity}** \`${f.control_id}\` on \`${f.resource_id}\`: ${f.description}`
+              ),
+              '',
+              `_Generated at ${findings.generated_at}_`,
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `GRC Scan: ${critical} critical, ${high} high findings (${new Date().toISOString().split('T')[0]})`,
+              body,
+              labels: ['grc-scan', 'automated'],
+            });
