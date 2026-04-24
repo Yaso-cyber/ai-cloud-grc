@@ -14,8 +14,8 @@
     "react-dom": "^18.3.0",
     "react-router-dom": "^6.23.1",
     "recharts": "^2.12.7",
-    "jspdf": "^2.5.1",
-    "jspdf-autotable": "^3.8.2",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.5",
     "axios": "^1.7.2",
     "clsx": "^2.1.1"
   },
@@ -26,7 +26,7 @@
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
-    "vite": "^5.2.12",
+    "vite": "^6.3.3",
     "vitest": "^1.6.0"
   }
 }
